@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component>
+  <sect1><featureAnchor features="f1 f2"/></sect1>
+  <featureGroup>
+    <feature id="f1"><math id="m1"/></feature>
+    <feature id="f2"><math id="m2"/></feature>
+  </featureGroup>
+</component>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component>
+  <sect1>
+    <math id="m1"/>
+    <featureAnchor features="f1"/>
+    <math id="m2"/>
+  </sect1>
+  <featureGroup>
+    <feature id="f1"><math id="m3"/></feature>
+  </featureGroup>
+  <sect1><math id="m4"/></sect1>
+</component>

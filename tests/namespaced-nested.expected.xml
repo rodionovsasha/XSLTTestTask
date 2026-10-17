@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="urn:example">
+  <sect1><math number="1" id="m1"/><featureAnchor features="f1"/><math number="3" id="m2"/></sect1>
+  <featureGroup><feature id="f1"><wrapper><math number="2" id="m3"/></wrapper></feature></featureGroup>
+</component>
