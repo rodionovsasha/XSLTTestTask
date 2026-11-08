@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
+    <xsl:param name="debug" select="'true'"/>
     <xsl:key name="feature-by-id" match="*[local-name() = 'feature']" use="@id"/>
     <xsl:key name="anchor-by-feature-id" match="*[local-name() = 'featureAnchor']" use="@features"/>
 
@@ -10,8 +11,14 @@
         in their physical location.
     -->
     <xsl:template match="/">
+        <xsl:if test="$debug = 'true'">
+            <xsl:message>[DEBUG] Transformation started; math count=<xsl:value-of select="count(//*[local-name() = 'math'])"/></xsl:message>
+        </xsl:if>
         <xsl:call-template name="validate-input"/>
         <xsl:apply-templates/>
+        <xsl:if test="$debug = 'true'">
+            <xsl:message>[DEBUG] Transformation completed.</xsl:message>
+        </xsl:if>
     </xsl:template>
 
     <xsl:template name="validate-input">
@@ -41,26 +48,30 @@
 
     <xsl:template match="*[local-name() = 'math']">
         <xsl:variable name="feature" select="ancestor::*[local-name() = 'feature'][1]"/>
+        <xsl:variable name="number">
+            <xsl:choose>
+                <xsl:when test="$feature">
+                    <xsl:variable name="anchor"
+                        select="key('anchor-by-feature-id', $feature/@id)"/>
+                    <xsl:value-of select="
+                        count($anchor/preceding::*[local-name() = 'math' and not(ancestor::*[local-name() = 'feature'])])
+                        + count(key('feature-by-id', $anchor/preceding::*[local-name() = 'featureAnchor']/@features)//*[local-name() = 'math'])
+                        + count(preceding::*[local-name() = 'math' and ancestor::*[local-name() = 'feature' and @id = $feature/@id]])
+                        + 1"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="
+                        count(preceding::*[local-name() = 'math' and not(ancestor::*[local-name() = 'feature'])])
+                        + count(key('feature-by-id', preceding::*[local-name() = 'featureAnchor']/@features)//*[local-name() = 'math'])
+                        + 1"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+        <xsl:if test="$debug = 'true'">
+            <xsl:message>[DEBUG] math id="<xsl:value-of select="@id"/>" feature="<xsl:value-of select="$feature/@id"/>" number=<xsl:value-of select="$number"/></xsl:message>
+        </xsl:if>
         <xsl:copy>
-            <xsl:attribute name="number">
-                <xsl:choose>
-                    <xsl:when test="$feature">
-                        <xsl:variable name="anchor"
-                            select="key('anchor-by-feature-id', $feature/@id)"/>
-                        <xsl:value-of select="
-                            count($anchor/preceding::*[local-name() = 'math' and not(ancestor::*[local-name() = 'feature'])])
-                            + count(key('feature-by-id', $anchor/preceding::*[local-name() = 'featureAnchor']/@features)//*[local-name() = 'math'])
-                            + count(preceding::*[local-name() = 'math' and ancestor::*[local-name() = 'feature' and @id = $feature/@id]])
-                            + 1"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:value-of select="
-                            count(preceding::*[local-name() = 'math' and not(ancestor::*[local-name() = 'feature'])])
-                            + count(key('feature-by-id', preceding::*[local-name() = 'featureAnchor']/@features)//*[local-name() = 'math'])
-                            + 1"/>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </xsl:attribute>
+            <xsl:attribute name="number"><xsl:value-of select="$number"/></xsl:attribute>
             <xsl:copy-of select="@*[not(namespace-uri() = '' and local-name() = 'number')]"/>
             <xsl:apply-templates/>
         </xsl:copy>
