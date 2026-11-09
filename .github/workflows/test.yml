@@ -10,4 +10,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt-get update && sudo apt-get install -y xsltproc libxml2-utils
-      - run: tests/run-tests.sh
+      - run: tests/run-tests-xslt1.sh
+      - run: tests/run-tests-xslt2.sh
+      - run: tests/run-tests-xslt3.sh
