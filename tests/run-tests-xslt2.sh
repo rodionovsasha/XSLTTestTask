@@ -31,6 +31,7 @@ assert_transform "$project_dir/task3_in.xml" "$project_dir/xml_out_2.xml"
 assert_transform "$project_dir/tests/after-feature-group.xml" "$project_dir/tests/after-feature-group.expected.xml"
 assert_transform "$project_dir/tests/existing-number.xml" "$project_dir/tests/existing-number.expected.xml"
 assert_transform "$project_dir/tests/namespaced-nested.xml" "$project_dir/tests/namespaced-nested.expected.xml"
+assert_transform "$project_dir/tests/indexed-feature-math.xml" "$project_dir/tests/indexed-feature-math.expected.xml"
 
 if transform -s:"$project_dir/tests/multiple-feature-ids.xml" -xsl:"$project_dir/task3-2.0.xsl" > /dev/null 2>&1; then
     echo "Expected a multi-ID featureAnchor to be rejected" >&2

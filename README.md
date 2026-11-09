@@ -14,28 +14,30 @@ All three stylesheets work for both namespaced and non-namespaced source XML:
 The XSLT 3.0 variant uses the standard `shallow-copy` mode; all variants
 produce the same result and enforce the same input contract.
 
-## IntelliJ IDEA compatibility
+## Stylesheet implementations
 
-The 2.0 and 3.0 stylesheets use the following constructs to reduce false
-positives in IDEA's XSLT inspections:
+The 2.0 and 3.0 variants use the features of their declared standards rather
+than workarounds for IDEA's inspections:
 
-- `anchor` is declared with `xsl:variable` before `number`. This avoids an
-  inline `let ... return` expression, which requires XPath 3.0 and therefore
-  does not belong in the 2.0 variant.
-- `xsl:copy-of select="@* except @number"` copies all attributes except the
-  existing unqualified `number`, which is replaced with the calculated value.
-  Namespaced attributes such as `prefix:number` are preserved. This avoids
-  IDEA's reported `Expected type 'xs:anyURI', got 'xs:string'` diagnostic on
-  the previous `namespace-uri() = ''` comparison.
-- In the 3.0 stylesheet, `xsl:mode on-no-match="shallow-copy"` appears at the
-  end of the file. This is a workaround attempt for IDEA's reported
-  `Cannot resolve symbol 'xsl:variable'` diagnostic; the declaration order
-  does not change the transformation behavior. Whether this clears the
-  highlighting still needs to be checked in IDEA.
+- Both use namespace wildcards such as `*:math` to match elements with or
+  without a namespace, and explicit types for the debug parameter, document,
+  feature, and calculated number.
+- Both use the `math-by-feature-id` key to retrieve feature math directly.
+  This avoids repeatedly walking feature subtrees when counting the math
+  contributed by preceding anchors. Counting preceding nodes is still needed;
+  this is not a single-pass or streaming transformation.
+- The 2.0 variant uses XPath 2.0, an explicit `anchor` variable, and an identity
+  template to copy nodes and attributes.
+- The 3.0 variant uses XPath `let ... return` for the anchor, the standard
+  `xsl:mode on-no-match="shallow-copy"` declaration, and `expand-text="yes"`
+  for concise diagnostic messages.
+- `@* except @number` preserves all attributes except the unqualified `number`
+  being replaced, including namespaced attributes such as `prefix:number`.
 
-Both test suites pass with these changes using the bundled Saxon-HE 10.6.
-Saxon accepts newer constructs even in stylesheets declaring version 2.0,
-so passing these tests alone does not establish strict XSLT 2.0 compatibility.
+IDEA may flag valid constructs in these stylesheets. The regression suites
+run them using the bundled Saxon-HE 10.6. Saxon accepts newer constructs even
+in stylesheets declaring version 2.0, so passing these tests alone does not
+establish strict XSLT 2.0 compatibility.
 
 ## Input contract
 
@@ -124,6 +126,11 @@ Output from deliberately invalid inputs is suppressed in both modes.
 Each suite covers the supplied example, a section after `featureGroup`,
 replacement of an existing number, namespaces, nested math in a feature, and
 invalid multi-ID or unresolved anchors.
+
+The 2.0 and 3.0 suites additionally cover multiple math nodes per feature,
+feature storage order differing from anchor order, an empty feature, mixed
+namespaces, preservation of a namespaced `number` attribute, and copying of
+comments, processing instructions, and literal braces in source text.
 
 To use another Saxon-HE JAR instead of the bundled 10.6 version, set
 `SAXON_JAR`, for example: `SAXON_JAR=/path/to/Saxon-HE.jar tests/run-tests-xslt3.sh`.

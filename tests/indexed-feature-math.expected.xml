@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns:m="urn:math" xmlns:f="urn:feature" xmlns:a="urn:attributes">
+  <?preserve instruction?>
+  <!-- Features are stored in a different order from their anchors. -->
+  <section><math number="1" id="m1"/><featureAnchor features="f2"/><math number="4" id="m2"/><featureAnchor features="f1"/><featureAnchor features="empty"/><math number="7" id="m3"/></section>
+  <featureGroup>
+    <f:feature id="f1"><wrapper><m:math number="5" id="f1a" a:number="keep"/><math number="6" id="f1b"/></wrapper></f:feature>
+    <feature id="f2"><m:math number="2" id="f2a"/><math number="3" id="f2b"/></feature>
+    <feature id="empty"/>
+  </featureGroup>
+  <math number="8" id="after">literal {text}</math>
+</component>
